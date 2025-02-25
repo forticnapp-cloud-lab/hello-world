@@ -1,0 +1,16 @@
+{  
+  "name": "hello-world",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "A simple hello world application",
+  "dependencies": {
+    "express": "4.17.3",
+    "axios": "1.3.2",
+    "hello-mod": "https://github.com/lacework-community/hello-mod.git"
+  }
+}
