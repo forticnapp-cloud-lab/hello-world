@@ -7,6 +7,13 @@
   <body onload="launchit()">
     <div id="hello" style="width: 10%; margin: 0 auto; text-align: center;">
       <h1>${hello_message}</h1>
+      ${(() => {
+        if( image_url != "IMAGE_URL" ){
+           return "<img width='150px' src='" + image_url + "'>"
+        } else {
+           return ""
+        }
+      })()}
     </div>
   </body>
 </html>

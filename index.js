@@ -13,6 +13,7 @@ app.get('/', mod.manageIndexRoute)
 app.use(express.static('public'))
 
 global.hello_message = "Hello World!"
+global.image_url     = ""
 
 app.listen(port, () => {
  console.log(`Server is running at http://localhost:${port}`);
