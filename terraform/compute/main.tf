@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.0"
+    }
+  }
+}
+
 variable "vpc_id" {}
 variable "subnet" {}
 variable "instance_name" {}
@@ -129,19 +138,37 @@ resource "aws_instance" "instance-server" {
 resource "aws_iam_role" "lab_role" {
   name = "LabRole"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      },
-    ]
-  })
+  assume_role_policy = data.aws_iam_policy_document.ec2_assume_role.json
+  managed_policy_arns = [
+    data.aws_iam_policy.admin_policy.arn
+  ]
 }
+
+data "aws_iam_policy_document" "ec2_assume_role" {
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+data "aws_iam_policy_document" "administrator_access_custom" {
+  statement {
+    actions = ["*"]
+    effect  = "Allow"
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "admin_policy" {
+  name        = "CustomAdministratorAccessPolicy"
+  description = "Custom policy granting AdministratorAccess"
+  policy      = data.aws_iam_policy_document.administrator_access_custom.json
+}
+
 
 resource "aws_iam_role_policy_attachment" "ec2_admin_policy_attachment" {
   role       = aws_iam_role.lab_role.name
