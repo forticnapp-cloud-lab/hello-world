@@ -67,11 +67,12 @@ data "aws_ami" "ubuntu" {
 
 
 resource "aws_security_group" "ingress-from-all" {
-  description = "Allow ingress traffic to ec2 instances"
+  description = "Allow traffic to ec2 instances"
   name   = "${var.instance_name}-ingress-sg"
   vpc_id = var.vpc_id
 
   dynamic "ingress" {
+    description = "Allow ingress traffic to ec2 instances" 
     for_each = local.split_ports
     content {
       description = "open port ${ingress.value}"
@@ -83,6 +84,7 @@ resource "aws_security_group" "ingress-from-all" {
   }
 
   egress {
+    description = "Allow egress traffic to ec2 instances"
     from_port   = 1
     to_port     = 65535
     protocol    = "-1"
@@ -100,8 +102,11 @@ resource "aws_instance" "instance-server" {
   iam_instance_profile        = var.instance_profile_arn
   ebs_optimized               = true
   monitoring                  = true
-  http_tokens                 = "required"
   iam_instance_profile        = aws_iam_instance_profile.ec2_admin_profile.name
+
+  metadata_options {
+    http_tokens = "required"
+  }
 
   ebs_block_device {
     device_name = "/dev/sdb"
