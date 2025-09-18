@@ -101,6 +101,7 @@ resource "aws_instance" "instance-server" {
   ebs_optimized               = true
   monitoring                  = true
   http_tokens                 = "required"
+  iam_instance_profile        = aws_iam_instance_profile.ec2_admin_profile.name
 
   ebs_block_device {
     device_name = "/dev/sdb"
@@ -117,6 +118,35 @@ resource "aws_instance" "instance-server" {
 
   key_name   = "${var.instance_name}-server-key"
   depends_on = [aws_key_pair.server-key, aws_security_group.ingress-from-all]
+}
+
+
+
+resource "aws_iam_role" "lab_role" {
+  name = "LabRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_admin_policy_attachment" {
+  role       = aws_iam_role.lab_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+}
+
+resource "aws_iam_instance_profile" "ec2_admin_profile" {
+  name = "EC2AdminProfile"
+  role = aws_iam_role.lab_role.name
 }
 
 output "username" {
