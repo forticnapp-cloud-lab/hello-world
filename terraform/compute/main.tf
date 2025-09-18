@@ -99,7 +99,6 @@ resource "aws_instance" "instance-server" {
   associate_public_ip_address = tobool(var.public_ip)
   subnet_id                   = var.subnet
   vpc_security_group_ids      = compact(concat([aws_security_group.ingress-from-all.id], local.split_sg_arns))
-  iam_instance_profile        = var.instance_profile_arn
   ebs_optimized               = true
   monitoring                  = true
   iam_instance_profile        = aws_iam_instance_profile.ec2_admin_profile.name
